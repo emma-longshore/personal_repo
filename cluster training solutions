@@ -1,0 +1,64 @@
+## personal_repo
+# cluster training
+(Q1) What are the two objects?
+The two objects are empty folders ‘.’ And ‘..’
+(Q2) Open the file and take a look at what is in the VCF file using cat, more, and less commands. Which command did you find the most useful and why? 
+The less command is the most helpful as it shows the beginning of the file (often containing structural information)
+(Q3) How many lines does the VCF file have? (hint: do not count the lines manually and use one line command) 
+200 lines
+(Q4) How much did the gzip and bzip2 commands compress the original VCF? Which command would you use and why?
+Size was reduced by over 50%. Original size with no metadata is 29945 and after gzip and bzip2 10139
+(Q5) Can you still see the file using more or less (Type q to quit) and why?
+The file opens, but is unreadable due to the file not being fully downloaded
+(Q6) What are the advantages and disadvantages? 
+Soft links are beneficial in routing to the original file, while hard links are a direct copy. They are particularly useful when working with large file sizes
+(Q7) How many chromosomes did you find in the FASTA file?
+123 chromosomes
+(Q8) What command did you use? Describe the command options you used. Describe potential issues if `-u $(id -u):$(id -g)` is not used. 
+docker run --rm -v $(pwd):$(pwd) -w $(pwd) \
+                blcdsdockerregistry/samtools:1.12 \
+                samtools faidx linked
+I simply used the -v option to ensure the samtools and docker versions are being pulled from the present working directory
+If `-u $(id -u):$(id -g)` is not used, the output file names are default and may be difficult to decipher
+(Q9) Are they identical or not? If not, how did you find the difference? 
+No, they are not identical. Differences were determined using sha512sum failink
+(Q10) Run the same docker image interactively with the -u $(id -u):$(id -g) option. Explain why you see
+
+docker run --rm -v -u $(id -u):$(id -g)-w $(pwd) \
+                blcdsdockerregistry/samtools:1.12 \
+                samtools faidx linked
+(Q11) How many CPUs does the node have? 
+2
+(Q12) How much RAM (in GB) does the node have? 
+3.7G
+(Q13) What is the ratio of CPU:RAM in Fsv2-series? 
+1.85G per core
+(Q14) How many F2, F16 , F32, F72 and M64 nodes are available in total (including allocated nodes) for each partition?
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+F16          up   infinite      4    mix F16-[1,3-5]
+F16          up   infinite      1  alloc F16-2
+F2*          up   infinite      4  idle~ F2-[28,30,35,39]
+F2*          up   infinite     38  alloc F2-[1-27,29,31-34,36-38,40-42]
+F32          up   infinite     10  idle~ F32-[1-10]
+F72          up   infinite      8  idle~ F72-[7,19-25]
+F72          up   infinite     17  alloc F72-[1-6,8-18]
+M64          up   infinite      1  idle~ M64-1
+(Q15) What command did you use? How do you show the allocated CPUs and RAM?
+srun --exclusive --partition="F16" –mem 4000 –-cpus 2 --pty bash
+cpus/cores defines allocated computers, mem allocates memory in gigabytes
+(Q16) An F16 node was spun up using `srun` command and the node was used for 30 hours and only 50% of available CPUs were used. The user forgot to exit the node for extra 4 days but no CPUs were used during the time. Estimate the computing costs of the srun session. (hint: see Cluster configuration) 
+9 cpus @ 126 hrs~$.42/h
+$52.92 computational cost
+(Q17) An F72 node was spun up using `sbatch` command. The align-DNA pipeline ran for 40 hours and the node was decommissioned. Only ~50% of /scratch was used for storing intermediate files. Estimate the computing costs of the sbatch job. (hint: see Cluster configuration) 
+40 hrs @ $1.8/hr
+$72 computational cost
+(Q18) Estimate our current monthly expenses of the cloud storage (/hot) using a cache disk rate - $0.000024 (GB/h) (hint: use `df -h /hot` and assume we use an additional 50% of data for snapshot e.g. 2TB for /hot and 1TB for snapshot) What can you do to reduce the expenses next month?
+Current use in /hot – 1.3p
+1.3p + 3 TB @ 730hrs~$0.000024 (GB/h)
+$32.272/hour or $22,828.56/month
+(Q19) Check /hot/users/permission-test and see which directories you have permission to write (hint: type ls -lh and also, see /etc/group) and explain why
+[elongshore@ip-0A125223 clustertraining]$ ls -lh /hot/users/permission-test
+total 48K
+drwxrws---. 2 root boutrosdev     16K Sep 24  2021 dev
+drwxrws---. 2 root boutrostrainee 16K Feb  3 10:28 trainee
+drwxrws---. 2 root boutrosuser    16K Feb  9 07:49 user
